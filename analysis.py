@@ -19,6 +19,11 @@
 # Set the given parameters to obtain the specified policies through
 # value iteration.
 
+## Discount: how much agent favors future rewards (lower means wants rewards sooner)
+## Noise: uncertainty in movement (zero noise means agent moves reliably in intended direction)
+##      - higher noise which means unreliable movement and more risky when going to cliff
+## Living reward: reward from every non-terminal step (- encourages agent to finish quick vs + )
+ 
 def question2():
     answerDiscount = 0.9
     answerNoise = 0.005
