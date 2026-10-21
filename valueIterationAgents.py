@@ -217,4 +217,76 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        mdp = self.mdp
+        values = self.values
+
+        # compute previous values
+        predecessors = {}
+        for state in mdp.getStates():
+            if mdp.isTerminal(state):
+                continue
+            for action in mdp.getPossibleActions(state):
+                for next, prob in mdp.getTransitionStatesAndProbs(state, action):
+                    
+                    if predecessors.get(next) is None:
+                        predecessors[next] = set()
+
+                    predecessors[next].add(state)
+
+
+        # initialize empty pq
+        pq = util.PriorityQueue()
+
+        for state in mdp.getStates():
+
+            if mdp.isTerminal(state):
+                continue
+
+            
+            actions = mdp.getPossibleActions(state)
+            if actions is None:
+                continue
+            maxValue = float("-inf")
+            for action in actions:
+                maxValue = max(maxValue, self.computeQValueFromValues(state, action))
+
+            diff = abs(maxValue - values[state])
+            pq.push(state, -diff)
+
+        for i in range(self.iterations):
+            if (pq.isEmpty()):
+                break
+                
+            state = pq.pop()
+
+            if mdp.isTerminal(state):
+                continue
+            
+            actions = mdp.getPossibleActions(state)
+            if actions is None:
+                continue
+            maxValue = float("-inf")
+            for action in actions:
+                maxValue = max(maxValue, self.computeQValueFromValues(state, action))
+
+            
+            values[state] = maxValue
+
+            for predecessor in predecessors[state]:
+
+                actions = mdp.getPossibleActions(predecessor)
+                if actions is None:
+                    continue
+                maxValue2 = float("-inf")
+                for action in actions:
+                    maxValue2 = max(maxValue2, self.computeQValueFromValues(predecessor, action))
+
+                diff2 = abs(values[predecessor]- maxValue2)
+
+                if diff2 > self.theta:
+                    pq.update(predecessor, -diff2)
+            
+
+
+
 
